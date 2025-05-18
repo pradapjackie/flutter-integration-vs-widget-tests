@@ -1,4 +1,4 @@
-name: Flutter iOS Integration Test
+name: Flutter Tests (Widget + App + Integration)
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
-  ios-integration-test:
-    runs-on: macos-latest
-    timeout-minutes: 30
+  test:
+    name: Run Widget and App Tests
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -20,20 +20,57 @@ jobs:
         with:
           flutter-version: '3.16.3'
 
-      - name: Enable iOS
-        run: flutter config --enable-ios
+      - name: Disable Web/Desktop
+        run: |
+          flutter config --no-enable-web
+          flutter config --no-enable-linux-desktop
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Prebuild iOS (to install pods)
-        run: flutter build ios --simulator --no-codesign
+      - name: Run Widget Tests
+        run: flutter test test/widget_test.dart
 
-      - name: Run integration test on iOS simulator
-        run: |
-          xcrun simctl boot "iPhone 14"
-          open -a Simulator
-          flutter drive \
-            --target=integration_test/app_test.dart \
-            --driver=test_driver/integration_test.dart \
-            -d "iPhone 14"
+      - name: Run App Tests
+        run: flutter test test/app_test.dart
+
+  integration-test:
+    name: Run Real Integration Test (Android Emulator)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.3'
+
+      - name: Run Android Emulator and Integration Test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel
+          emulator-options: -no-window -no-audio -no-boot-anim -accel off
+          disable-animations: true
+          pre-emulator-launch-script: |
+            echo "Waiting for ADB and emulator to settle..."
+            adb kill-server || true
+            sleep 5
+            adb start-server
+            sleep 15
+          script: |
+            adb wait-for-device
+            boot_complete=""
+            until [[ "$boot_complete" == "1" ]]; do
+              boot_complete=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+              echo "boot_complete=$boot_complete"
+              sleep 5
+            done
+            echo "Boot complete. Running integration test..."
+            flutter drive \
+              --driver=test_driver/integration_test.dart \
+              --target=integration_test/app_test.dart
