@@ -1,4 +1,4 @@
-name: Flutter Tests
+name: Flutter Tests (no web)
 
 on:
   push:
@@ -7,8 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  widget-tests:
-    name: Run Widget Tests
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +18,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.16.3'
+
+      - name: Disable web support (prevent web device usage)
+        run: flutter config --no-enable-web
+
+      - name: Clean previous builds
+        run: flutter clean
 
       - name: Install dependencies
         run: flutter pub get
@@ -26,23 +31,7 @@ jobs:
       - name: Run Widget Tests
         run: flutter test test/
 
-  integration-tests:
-    name: Run Integration Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.16.3'
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run Integration Tests (non-web)
+      - name: Run Integration Tests (headless)
         run: flutter test integration_test/
         env:
           DISPLAY: ":99"
