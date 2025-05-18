@@ -1,12 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_button_counter/main.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized(); // ✅ Works in headless CI without device
 
-  setUp(() async {}); // Optional: Add global setup if needed
+  setUp(() async {}); // Optional global setup
 
   testWidgets('Test 1: Initial count is 0', (tester) async {
     await tester.pumpWidget(const CounterApp());
