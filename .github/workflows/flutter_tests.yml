@@ -20,21 +20,17 @@ jobs:
         with:
           flutter-version: '3.16.3'
 
-      - name: Disable Web (avoid device conflicts)
+      - name: Disable Web
         run: flutter config --no-enable-web
 
-      - name: Clean Project
+      - name: Clean project
         run: flutter clean
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: flutter pub get
 
       - name: Run Widget Tests
         run: flutter test test/
-        env:
-          ENABLE_FLUTTER_DESKTOP: false  # ⛔ Avoid Linux GUI build
 
-      - name: Run Integration Tests (Headless)
+      - name: Run Integration Tests
         run: flutter test integration_test/
-        env:
-          ENABLE_FLUTTER_DESKTOP: false  # ⛔ Prevent Linux build & CMake errors
