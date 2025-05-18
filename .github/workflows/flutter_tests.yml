@@ -1,4 +1,4 @@
-name: Flutter Tests
+name: Flutter Tests (Headless)
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
 
 jobs:
   test:
+    name: Run Widget & Integration Tests (CI Safe)
     runs-on: ubuntu-latest
-    name: Run Widget & Integration Tests
 
     steps:
       - name: Checkout code
@@ -20,17 +20,17 @@ jobs:
         with:
           flutter-version: '3.16.3'
 
-      - name: Enable Linux Desktop
-        run: flutter config --enable-linux-desktop
+      - name: Disable Web Support (prevent device confusion)
+        run: flutter config --no-enable-web
 
-      - name: Clean project
+      - name: Clean Project
         run: flutter clean
 
-      - name: Get dependencies
+      - name: Get Dependencies
         run: flutter pub get
 
       - name: Run Widget Tests
         run: flutter test test/
 
-      - name: Run Integration Tests on Linux
-        run: flutter test -d linux integration_test/
+      - name: Run Integration Tests (headless, no platform)
+        run: flutter test integration_test/
