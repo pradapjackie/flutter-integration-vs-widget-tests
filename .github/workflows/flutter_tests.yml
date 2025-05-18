@@ -1,0 +1,30 @@
+name: Flutter Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-tests:
+    name: Run Widget & Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.3' #
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Widget Tests
+        run: flutter test test/
+
+      - name: Run Integration Tests (headless)
+        run: flutter test integration_test/

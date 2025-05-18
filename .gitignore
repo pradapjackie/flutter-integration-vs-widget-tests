@@ -1,0 +1,61 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Output files
+*.log
+*.tmp
+
+# iOS/macOS
+ios/Flutter/Flutter.podspec
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/DerivedData/
+macos/Pods/
+macos/Runner.xcworkspace/
+macos/DerivedData/
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+android/.idea/
+
+# Web
+web/generated_plugin_registrant.dart
+
+# Linux & Windows
+linux/flutter/
+linux/build/
+windows/flutter/
+windows/build/
+
+# Tests
+coverage/
+test_output.json
+test-results.xml
+
+# Allure (if ever used)
+allure-report/
+allure-results/
+
+# Environment secrets
+.env
+*.keystore
+
+# Misc
+.DS_Store
+*.lock
+*.bak
+*.swp
+*.orig
