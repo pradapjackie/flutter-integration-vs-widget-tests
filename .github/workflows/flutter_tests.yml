@@ -10,7 +10,7 @@ on:
     branches: [ main ] # Runs on pull requests targeting the main branch
 
 jobs:
-  run_android_integration_tests: # Renamed job for clarity
+  run_android_integration_tests:
     runs-on: ubuntu-latest # Android emulators run well on Linux runners
 
     steps:
@@ -30,31 +30,22 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      # 4. (Optional) Enable specific Flutter features if needed
-      #    e.g., flutter config --enable-linux-desktop if you had other jobs
-
-      # 5. Run Android Integration Tests
+      # 4. Run Android Integration Tests
       - name: Run Flutter integration tests on Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29 # Specify the API level for the emulator
-          # target: default # default, google_apis, google_apis_playstore, aosp_atd, google_atd
-          arch: x86_64 # Specify the architecture (x86, x86_64)
+          api-level: 30 # Changed API level to 30 (Android 11)
+          target: google_apis # Using google_apis target
+          arch: x86_64 # Specify the architecture
           profile: Nexus 6 # Specify the device profile
-          # cores: 2 # Number of CPU cores to use for the emulator
-          # ram-size: 1536M # RAM size for the emulator
-          # disk-size: 2048M # Disk size for the emulator
-          # sdcard-path-or-size: 100M # SD card path or size
-          # avd-name: test_avd # Custom AVD name
-          # force-avd-creation: false # Set to true to always create a new AVD
-          # emulator-options: -no-snapshot-load -no-snapshot-save -no-audio -no-boot-anim -camera-back none -camera-front none
-          # disable-animations: true # Disable animations for faster tests
-          # script: flutter test integration_test # Command to run after emulator is ready
-          # OR, if your tests are in a specific file/directory within integration_test:
-          script: flutter test integration_test/app_test.dart # Example: if your main test file is app_test.dart
+          ram-size: 2048M # Explicitly set RAM size
+          # disk-size: 2048M # Optional: set disk size if needed
+          force-avd-creation: true # Ensure a fresh AVD is created
+          emulator-options: -no-snapshot -no-window -no-audio -no-boot-anim -wipe-data # Added -wipe-data for a clean start. Other options are often default.
+          disable-animations: true # Disable animations for faster and more stable tests
+          script: flutter test integration_test/app_test.dart # Command to run after emulator is ready
 
-      # 6. (Optional) Upload Test Artifacts
-      # If your tests generate reports, you can upload them.
+      # 5. (Optional) Upload Test Artifacts
       # - name: Upload Test Results
       #   if: always() # Always run this step, even if tests fail
       #   uses: actions/upload-artifact@v4
