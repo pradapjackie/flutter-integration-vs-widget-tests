@@ -1,39 +1,63 @@
-name: Flutter Integration Test
+# .github/workflows/flutter_integration_tests.yml
 
+name: Flutter Integration Tests
+
+# Controls when the workflow will run
 on:
   push:
-    branches: [ main ]
+    branches: [ main ] # Runs on pushes to the main branch
   pull_request:
-    branches: [ main ]
+    branches: [ main ] # Runs on pull requests targeting the main branch
 
 jobs:
-  integration-test:
-    runs-on: ubuntu-latest
+  run_android_integration_tests: # Renamed job for clarity
+    runs-on: ubuntu-latest # Android emulators run well on Linux runners
 
     steps:
-      - name: Checkout code
+      # 1. Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Set up Flutter SDK
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.3'
+          flutter-version: '3.22.0' # Specify your desired Flutter version
+          channel: 'stable'
+          cache: true # Enable caching for Flutter dependencies
 
-      - name: Run Android Emulator and Integration Test
+      # 3. Get Flutter dependencies
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # 4. (Optional) Enable specific Flutter features if needed
+      #    e.g., flutter config --enable-linux-desktop if you had other jobs
+
+      # 5. Run Android Integration Tests
+      - name: Run Flutter integration tests on Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: pixel
-          script: |
-            adb devices
-            adb wait-for-device
-            adb shell settings put global window_animation_scale 0
-            adb shell settings put global transition_animation_scale 0
-            adb shell settings put global animator_duration_scale 0
-            flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
-          disable-animations: true
-          working-directory: .
-          emulator-options: -no-snapshot-save -no-window -noaudio -no-boot-anim
-          script-timeout-minutes: 10
+          api-level: 29 # Specify the API level for the emulator
+          # target: default # default, google_apis, google_apis_playstore, aosp_atd, google_atd
+          arch: x86_64 # Specify the architecture (x86, x86_64)
+          profile: Nexus 6 # Specify the device profile
+          # cores: 2 # Number of CPU cores to use for the emulator
+          # ram-size: 1536M # RAM size for the emulator
+          # disk-size: 2048M # Disk size for the emulator
+          # sdcard-path-or-size: 100M # SD card path or size
+          # avd-name: test_avd # Custom AVD name
+          # force-avd-creation: false # Set to true to always create a new AVD
+          # emulator-options: -no-snapshot-load -no-snapshot-save -no-audio -no-boot-anim -camera-back none -camera-front none
+          # disable-animations: true # Disable animations for faster tests
+          # script: flutter test integration_test # Command to run after emulator is ready
+          # OR, if your tests are in a specific file/directory within integration_test:
+          script: flutter test integration_test/app_test.dart # Example: if your main test file is app_test.dart
+
+      # 6. (Optional) Upload Test Artifacts
+      # If your tests generate reports, you can upload them.
+      # - name: Upload Test Results
+      #   if: always() # Always run this step, even if tests fail
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: android-integration-test-results
+      #     path: build/reports/integration_tests/ # Adjust path as needed
