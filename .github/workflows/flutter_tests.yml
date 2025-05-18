@@ -7,25 +7,25 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run Widget and App Tests
+  flutter-tests:
+    name: Run Widget & App Tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.16.3'
 
-      - name: Disable Web/Desktop
+      - name: Disable Web and Desktop
         run: |
           flutter config --no-enable-web
           flutter config --no-enable-linux-desktop
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: flutter pub get
 
       - name: Run Widget Tests
@@ -35,14 +35,15 @@ jobs:
         run: flutter test test/app_test.dart
 
   integration-test:
-    name: Run Real Integration Test (Android Emulator)
+    name: Run Integration Test on Android Emulator
     runs-on: ubuntu-latest
+    needs: flutter-tests
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
+      - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.16.3'
@@ -57,7 +58,7 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -accel off
           disable-animations: true
           pre-emulator-launch-script: |
-            echo "Waiting for ADB and emulator to settle..."
+            echo "Resetting ADB and waiting for emulator..."
             adb kill-server || true
             sleep 5
             adb start-server
@@ -70,7 +71,9 @@ jobs:
               echo "boot_complete=$boot_complete"
               sleep 5
             done
-            echo "Boot complete. Running integration test..."
+            echo "Emulator ready."
+
+            flutter pub get
             flutter drive \
               --driver=test_driver/integration_test.dart \
               --target=integration_test/app_test.dart
