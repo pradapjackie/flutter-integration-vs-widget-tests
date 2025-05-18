@@ -1,4 +1,4 @@
-name: Flutter Tests (Headless)
+name: Flutter Tests (Headless CI)
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run Widget & Integration Tests (CI Safe)
+  flutter-test:
+    name: Run Widget & Integration Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -20,17 +20,21 @@ jobs:
         with:
           flutter-version: '3.16.3'
 
-      - name: Disable Web Support (prevent device confusion)
+      - name: Disable Web (avoid device conflicts)
         run: flutter config --no-enable-web
 
       - name: Clean Project
         run: flutter clean
 
-      - name: Get Dependencies
+      - name: Install Dependencies
         run: flutter pub get
 
       - name: Run Widget Tests
         run: flutter test test/
+        env:
+          ENABLE_FLUTTER_DESKTOP: false  # ⛔ Avoid Linux GUI build
 
-      - name: Run Integration Tests (headless, no platform)
+      - name: Run Integration Tests (Headless)
         run: flutter test integration_test/
+        env:
+          ENABLE_FLUTTER_DESKTOP: false  # ⛔ Prevent Linux build & CMake errors
