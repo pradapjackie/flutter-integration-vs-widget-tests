@@ -7,18 +7,18 @@ on:
     branches: [ main ]
 
 jobs:
-  run-tests:
-    name: Run Widget & Integration Tests
+  widget-tests:
+    name: Run Widget Tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.3' #
+          flutter-version: '3.16.3'
 
       - name: Install dependencies
         run: flutter pub get
@@ -26,5 +26,23 @@ jobs:
       - name: Run Widget Tests
         run: flutter test test/
 
-      - name: Run Integration Tests (headless)
+  integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.3'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Integration Tests (non-web)
         run: flutter test integration_test/
+        env:
+          DISPLAY: ":99"
