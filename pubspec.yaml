@@ -1,9 +1,9 @@
 name: flutter_button_counter
-description: A Flutter app with increment, decrement, and reset buttons.
+description: A simple counter app to demonstrate widget vs integration tests.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -14,6 +14,7 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
+  test: any
 
 flutter:
   uses-material-design: true

@@ -1,4 +1,4 @@
-name: Flutter Tests (Split by Type)
+name: Flutter iOS Integration Test
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run Flutter Tests
-    runs-on: ubuntu-latest
+  ios-integration-test:
+    runs-on: macos-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -20,17 +20,20 @@ jobs:
         with:
           flutter-version: '3.16.3'
 
-      - name: Disable Web
-        run: flutter config --no-enable-web
-
-      - name: Clean project
-        run: flutter clean
+      - name: Enable iOS
+        run: flutter config --enable-ios
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run Widget Tests
-        run: flutter test test/widget_test.dart
+      - name: Prebuild iOS (to install pods)
+        run: flutter build ios --simulator --no-codesign
 
-      - name: Run App Flow Test (app_test.dart)
-        run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+      - name: Run integration test on iOS simulator
+        run: |
+          xcrun simctl boot "iPhone 14"
+          open -a Simulator
+          flutter drive \
+            --target=integration_test/app_test.dart \
+            --driver=test_driver/integration_test.dart \
+            -d "iPhone 14"
