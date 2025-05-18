@@ -1,4 +1,4 @@
-name: Flutter Tests (Split by Type)
+name: Flutter Integration Test (Real Device)
 
 on:
   push:
@@ -7,8 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run Flutter Tests
+  integration-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,17 +19,11 @@ jobs:
         with:
           flutter-version: '3.16.3'
 
-      - name: Disable Web
-        run: flutter config --no-enable-web
-
-      - name: Clean project
-        run: flutter clean
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run Widget Tests
-        run: flutter test test/widget_test.dart
-
-      - name: Run App Flow Test (app_test.dart)
-        run: flutter test test/app_test.dart
+      - name: Enable Android SDK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel
+          script: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
