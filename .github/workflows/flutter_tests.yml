@@ -1,4 +1,4 @@
-name: Flutter Tests (Headless CI)
+name: Flutter Tests (Split by Type)
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  flutter-test:
-    name: Run Widget & Integration Tests
+  test:
+    name: Run Flutter Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +30,7 @@ jobs:
         run: flutter pub get
 
       - name: Run Widget Tests
-        run: flutter test test/
+        run: flutter test test/widget_test.dart
 
-      - name: Run Integration Tests
-        run: flutter test integration_test/
+      - name: Run App Flow Test (app_test.dart)
+        run: flutter test test/app_test.dart
