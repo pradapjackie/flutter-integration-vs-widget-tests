@@ -1,4 +1,4 @@
-name: Flutter Integration Test (Real Device)
+name: Flutter Integration Test
 
 on:
   push:
@@ -19,11 +19,21 @@ jobs:
         with:
           flutter-version: '3.16.3'
 
-      - name: Enable Android SDK
+      - name: Run Android Emulator and Integration Test
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
           target: google_apis
           arch: x86_64
           profile: pixel
-          script: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+          script: |
+            adb devices
+            adb wait-for-device
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
+            flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+          disable-animations: true
+          working-directory: .
+          emulator-options: -no-snapshot-save -no-window -noaudio -no-boot-anim
+          script-timeout-minutes: 10
